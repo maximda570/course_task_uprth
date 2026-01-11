@@ -1,0 +1,8 @@
+"""
+Пакет solvers
+"""
+
+from .butcher_table import ButcherTable
+from .runge_kutta_solver import RKSolver
+
+__all__ = ['ButcherTable', 'RKSolver']
