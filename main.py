@@ -21,13 +21,12 @@ X_RANGE = (0, 3)
 Y_RANGE = (-1, 1)
 
 # Параметры метода Рунге-Кутты
-BUTCHER_A = [[0, 0, 0, 0],
-             [0.5, 0, 0, 0],
-             [0, 0.5, 0, 0],
-             [0, 0, 1, 0]]
+BUTCHER_A = [[ 0, 0, 0],
+             [ 2/3, 0, 0],
+             [ -1/3, 1, 0]]
 
-BUTCHER_B = [1/6, 1/3, 1/3, 1/6]
-BUTCHER_C = [0, 0.5, 0.5, 1]
+BUTCHER_B = [0, 2/3, 2/3]
+BUTCHER_C = [0.25, 0.5, 0.25]
 
 from classes.body import Body
 from classes.spatial_point import SpatialPoint
@@ -190,7 +189,7 @@ def main():
             ax.plot(np.array(x_num)[sorted_idx_num], 
                    np.array(y_num)[sorted_idx_num],
                    'bo-', linewidth=2, markersize=6,
-                   label='Численное (RK4)')
+                   label='Численное')
             
 
     
