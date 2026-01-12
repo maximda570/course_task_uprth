@@ -142,19 +142,7 @@ def main():
         NUM_POINTS
     )
     
-    # Заполняем аналитическими решениями
-    for point in body_analytic.points:
-        point.trajectory.times = []
-        point.trajectory.positions = []
-        
-        x0 = point.x
-        y0 = point.y
-        
-        for t in np.linspace(TIME_START, TIME_END, 20):
-            x_t, y_t = velocity_field.analytical_solution(x0, y0, TIME_START, t)
-            point.trajectory.add(t, SpatialPoint(x_t, y_t))
-            if t == TIME_END:
-                point.set_position(SpatialPoint(x_t, y_t))
+   
 
     visualizer = Visualizer()
     
@@ -176,7 +164,7 @@ def main():
         show_body=True
     )
     
-    # Создаем данные для сравнения
+    # Создаем данные
     comparison_times = [0.0, 0.5, 1.0]
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     
@@ -193,63 +181,38 @@ def main():
                 x_num.append(x_vals[time_idx])
                 y_num.append(y_vals[time_idx])
         
-        # Аналитическое решение
-        x_ana, y_ana = [], []
-        for point in body_analytic.points:
-            traj_data = point.get_trajectory_coords()
-            if len(traj_data) >= 3:
-                traj_times, x_vals, y_vals = traj_data
-                time_idx = np.argmin(np.abs(np.array(traj_times) - t))
-                x_ana.append(x_vals[time_idx])
-                y_ana.append(y_vals[time_idx])
-        
-        if x_num and x_ana:
+      
+        if x_num :
             # Сортируем
             sorted_idx_num = np.argsort(x_num)
-            sorted_idx_ana = np.argsort(x_ana)
+
             
             ax.plot(np.array(x_num)[sorted_idx_num], 
                    np.array(y_num)[sorted_idx_num],
                    'bo-', linewidth=2, markersize=6,
                    label='Численное (RK4)')
             
-            ax.plot(np.array(x_ana)[sorted_idx_ana], 
-                   np.array(y_ana)[sorted_idx_ana],
-                   'r--', linewidth=2, markersize=6,
-                   label='Аналитическое')
-            
-            # Вычисляем ошибку
-            errors = []
-            for xn, yn, xa, ya in zip(x_num, y_num, x_ana, y_ana):
-                error = np.sqrt((xn - xa)**2 + (yn - ya)**2)
-                errors.append(error)
-            
-            avg_error = np.mean(errors)
-            ax.text(0.05, 0.95, f'Ср. ошибка: {avg_error:.2e}',
-                   transform=ax.transAxes, fontsize=9,
-                   verticalalignment='top',
-                   bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-        
+
+    
         ax.set_xlabel('x₁')
         ax.set_ylabel('x₂')
-        ax.set_title(f'Сравнение при t={t:.2f}')
+        ax.set_title(f' при t={t:.2f}')
         ax.grid(True, alpha=0.3)
         ax.legend()
         ax.set_xlim(X_RANGE)
         ax.set_ylim(Y_RANGE)
     
-    plt.suptitle('СРАВНЕНИЕ ЧИСЛЕННОГО (RK4) И АНАЛИТИЧЕСКОГО РЕШЕНИЙ', 
+    plt.suptitle('Дефрормация', 
                 fontsize=14, fontweight='bold', y=1.05)
     plt.tight_layout()
     plt.show()
     
     print("Итоги:")
     
-    # Сравнение решений
-    compare_solutions(body, body_analytic, velocity_field)
+
     
     # Статистика деформации
-    if body.points and body_analytic.points:
+    if body.points:
         # Начальная длина
         initial_x = [p.trajectory.positions[0].x for p in body.points 
                     if p.trajectory.positions]
@@ -258,21 +221,15 @@ def main():
         # Конечная длина (численная)
         final_x_num = [p.position.x for p in body.points]
         final_length_num = max(final_x_num) - min(final_x_num) if final_x_num else 0
-        
-        # Конечная длина (аналитическая)
-        final_x_ana = [p.position.x for p in body_analytic.points]
-        final_length_ana = max(final_x_ana) - min(final_x_ana) if final_x_ana else 0
+
         
         deformation_num = (final_length_num - initial_length) / initial_length
-        deformation_ana = (final_length_ana - initial_length) / initial_length
+
         
         print("\nСТАТИСТИКА ДЕФОРМАЦИИ:")
         print(f"  Начальная длина: {initial_length:.6f}")
         print(f"  Конечная длина (числ.): {final_length_num:.6f}")
-        print(f"  Конечная длина (аналит.): {final_length_ana:.6f}")
+
         print(f"  Деформация (числ.): {deformation_num:.6f} ({deformation_num:.2%})")
-        print(f"  Деформация (аналит.): {deformation_ana:.6f} ({deformation_ana:.2%})")
-        print(f"  Отличие в деформации: {abs(deformation_num - deformation_ana):.2e}")
-    
-  
+
 main()
