@@ -93,19 +93,16 @@ class Visualizer:
             ax2.clabel(contours, inline=True, fontsize=8)
             
             # ДОБАВЛЯЕМ СТРЕЛКИ НА ГРАФИК РАСПРЕДЕЛЕНИЯ СКОРОСТЕЙ
-            # Используем разреженную сетку для стрелок (каждый 4-й узел)
             skip = max(1, resolution // 4)
             X_sparse = X[::skip, ::skip]
             Y_sparse = Y[::skip, ::skip]
             U_sparse = U[::skip, ::skip]
             V_sparse = V[::skip, ::skip]
             
-            # Рассчитываем длину стрелок (нормализованную)
             magnitude = np.sqrt(U_sparse**2 + V_sparse**2)
             magnitude[magnitude == 0] = 1  # избегаем деления на ноль
             
-            # Фиксированная длина стрелок для одинакового размера
-            arrow_length = 0.1 * (x_range[1] - x_range[0])  # 3% от ширины графика
+            arrow_length = 0.1 * (x_range[1] - x_range[0]) 
             U_norm = U_sparse / magnitude * arrow_length
             V_norm = V_sparse / magnitude * arrow_length
             
